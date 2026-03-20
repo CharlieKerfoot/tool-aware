@@ -8,18 +8,24 @@ import anthropic
 RUBRIC_PROMPT = """\
 You are evaluating emerging developer tools for a weekly digest.
 
-Score each tool on three dimensions (1-5 each):
-- Signal: GitHub stars velocity + HN traction in first week
-- Fit: Relevance to agentic AI, dev tools, coding assistants, Python/TS ecosystems
-- Timing: Is this genuinely new (week 1) or already mainstream?
+Score each tool on five dimensions (1-5 each):
+- Novelty: How original is this? 5 = first-of-its-kind approach, 1 = yet-another clone
+- Usefulness: Would this actually save a developer time or solve a real pain point? \
+5 = obvious daily-driver potential, 1 = solution looking for a problem
+- Developer Experience: Polish, docs quality, ease of getting started. \
+5 = npm install and go, 1 = undocumented and broken
+- Buzz: GitHub stars velocity, HN points, community excitement in its first week. \
+5 = trending everywhere, 1 = crickets
+- Timing: Is the ecosystem ready for this? 5 = perfect moment, 1 = too early or too late
 
 Return a JSON array of objects with these fields:
-  name, url, signal, fit, timing, total, tier, one_liner
+  name, url, novelty, usefulness, dx, buzz, timing, total, tier, one_liner, hot_take
 
 Where:
-  total = signal + fit + timing
-  tier = "try" if total >= 11, "watch" if total >= 8, "drop" if total < 8
+  total = novelty + usefulness + dx + buzz + timing
+  tier = "try" if total >= 18, "watch" if total >= 13, "drop" if total < 13
   one_liner = a single sentence describing what the tool does
+  hot_take = a brief, opinionated 1-2 sentence take on why this matters or doesn't
 
 Only include tools with tier "try" or "watch" in the output.
 
@@ -37,7 +43,7 @@ def score_tools(tools: list[dict]) -> list[dict]:
 
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=2048,
+        max_tokens=4096,
         messages=[{
             "role": "user",
             "content": RUBRIC_PROMPT + tools_json,

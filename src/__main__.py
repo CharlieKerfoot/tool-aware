@@ -16,8 +16,8 @@ def main() -> None:
     scored = score_tools(tools)
     print(f"[main] {len(scored)} tools scored")
 
-    try_tools = [t for t in scored if t.get("tier") == "try"]
-    watch_tools = [t for t in scored if t.get("tier") == "watch"]
+    try_tools = [t for t in scored if t["tier"] == "try"]
+    watch_tools = [t for t in scored if t["tier"] == "watch"]
 
     snoozed = get_due()
     if snoozed:
